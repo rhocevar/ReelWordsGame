@@ -25,6 +25,7 @@ public class GameManager
     // Variables
     //------------------------------------------------------------------------------------------------------------------
     private static GameManager m_instance;
+    private DataLoader m_dataLoader;
     private ReelWordsData m_data;
     
     //------------------------------------------------------------------------------------------------------------------
@@ -33,19 +34,28 @@ public class GameManager
     private GameManager() { }
     
     //------------------------------------------------------------------------------------------------------------------
-    public void StartGame()
+    public void Initialize(LanguageConfig languageConfig)
     {
-        Console.WriteLine("Game initialization started...");
-        DataLoader dataLoader = new DataLoader(DataLoader.LanguageConfig.en_us);
-        m_data = dataLoader.Load();
-
+        Console.WriteLine("Initializing game data...");
+        m_dataLoader = new DataLoader(languageConfig);
+        m_data = m_dataLoader.Load();
+        
         if (m_data == null)
         {
             Console.WriteLine("There was a problem loading the game data.");
             return;
         }
-        Console.WriteLine("Game initialization complete.");
-
+        
+        Console.WriteLine("Game data initialized successfully.");
+        
+        StartGame();
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    // TODO: consider moving all view related function to a View class.
+    // Could maybe created an interface IView, and a class ConsoleView that implements it
+    private void StartGame()
+    {
         Console.WriteLine("\n***************************\n***** Reel Words Game *****\n***************************");
         Console.WriteLine("--> Type '0' to end the game."); 
         while (true)

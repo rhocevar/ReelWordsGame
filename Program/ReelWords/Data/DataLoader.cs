@@ -10,14 +10,6 @@ namespace ReelWords.Data;
 public class DataLoader
 {
     //------------------------------------------------------------------------------------------------------------------
-    // Types
-    //------------------------------------------------------------------------------------------------------------------
-    public enum LanguageConfig
-    {
-        en_us, en_gb, pt_br
-    }
-    
-    //------------------------------------------------------------------------------------------------------------------
     // Constants
     //------------------------------------------------------------------------------------------------------------------
     private const string c_resourcesDirectoryName = "Resources";
@@ -103,7 +95,13 @@ public class DataLoader
             return null;
         }
 
-        return new ReelWordsData(words:loadWordsTask.Result, reels:loadReelsTask.Result, wordValidator:ValidateWord);
+        ReelWordsData data = new ReelWordsData(
+            words: loadWordsTask.Result, 
+            reels: loadReelsTask.Result,
+            wordValidator: ValidateWord
+        );
+
+        return data;
     }
     
     //------------------------------------------------------------------------------------------------------------------
