@@ -1,4 +1,4 @@
-﻿using ReelWords;
+﻿using ReelWords.Data;
 using Xunit;
 
 namespace ReelWordsTests;

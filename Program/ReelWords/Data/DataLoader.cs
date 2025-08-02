@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using ReelWords.Utilities;
 
-namespace ReelWords;
+namespace ReelWords.Data;
 
 public class DataLoader
 {

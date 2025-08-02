@@ -1,6 +1,7 @@
 using System;
+using ReelWords.Data;
 
-namespace ReelWords;
+namespace ReelWords.Game;
 
 public class GameManager
 {

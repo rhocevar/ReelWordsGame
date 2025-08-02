@@ -1,4 +1,6 @@
-﻿namespace ReelWords;
+﻿using ReelWords.Game;
+
+namespace ReelWords;
 
 public static class Program
 {

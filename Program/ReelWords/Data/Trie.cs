@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ReelWords;
+namespace ReelWords.Data;
 
 public class Trie
 {

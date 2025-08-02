@@ -1,6 +1,6 @@
 using System;
 
-namespace ReelWords;
+namespace ReelWords.Data;
 
 public class ReelWordsData
 {

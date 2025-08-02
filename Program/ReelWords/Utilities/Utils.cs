@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace ReelWords;
+namespace ReelWords.Utilities;
 
 public static class Utils
 {
