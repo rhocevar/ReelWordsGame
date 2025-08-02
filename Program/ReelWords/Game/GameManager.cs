@@ -50,7 +50,11 @@ public class GameManager
         Console.WriteLine("--> Type '0' to end the game."); 
         while (true)
         {
-            Console.Write("\nCreate a word using the letters from your reel: "); 
+            // TODO: Present the set of letters on the tray
+            // ...
+            
+            
+            Console.Write("\nCreate a word using the letters from your tray: "); 
             string input = Console.ReadLine();
             if (input == "0")
             {
@@ -71,7 +75,6 @@ public class GameManager
             if (wordExists)
             {
                 // TODO: Increase score
-                // TODO: Present new set of letters in reel
                 Console.WriteLine($"Good job! You earned X points from the word '{input}'.");
             }
             else

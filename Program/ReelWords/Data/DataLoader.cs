@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using ReelWords.Utilities;
@@ -20,12 +22,15 @@ public class DataLoader
     //------------------------------------------------------------------------------------------------------------------
     private const string c_resourcesDirectoryName = "Resources";
     private const string c_enUsFileName = "american-english-large.txt";
+    private const string c_defaultReelsFileName = "reels.txt";
     
     //------------------------------------------------------------------------------------------------------------------
     // Variables
     //------------------------------------------------------------------------------------------------------------------
-    private string m_dictionaryFileName;
+    private DirectoryInfo m_resourcesDirectory;
     private CharRange[] m_allowedCharacters;
+    private string m_wordsFileName;
+    private string m_reelsFileName;
     
     //------------------------------------------------------------------------------------------------------------------
     // Methods
@@ -33,21 +38,7 @@ public class DataLoader
     public DataLoader(LanguageConfig languageConfig)
     {
         SetLanguage(languageConfig);
-    }
-    
-    //------------------------------------------------------------------------------------------------------------------
-    public ReelWordsData Load()
-    {
-        Task<Trie> loadWordsTask = LoadWordsAsync();
-        Task.WaitAll(loadWordsTask);
-        
-        if (!loadWordsTask.IsCompletedSuccessfully || loadWordsTask.Result == null)
-        {
-            Console.WriteLine("There was a problem initializing the language dictionary.");
-            return null;
-        }
-
-        return new ReelWordsData(loadWordsTask.Result, ValidateWord);
+        SetResourcesDirectory();
     }
     
     //------------------------------------------------------------------------------------------------------------------ 
@@ -57,7 +48,8 @@ public class DataLoader
         {
             case LanguageConfig.en_us:
             {
-                m_dictionaryFileName = c_enUsFileName;
+                m_wordsFileName = c_enUsFileName;
+                m_reelsFileName = c_defaultReelsFileName;
                 m_allowedCharacters = new[] { new CharRange('a', 'z') };
                 Console.WriteLine($"Language set to '{languageConfig}'");
                 break;
@@ -79,6 +71,40 @@ public class DataLoader
             }
         }
     }
+
+    //------------------------------------------------------------------------------------------------------------------
+    private void SetResourcesDirectory()
+    {
+        m_resourcesDirectory = Utils.TryGetDirectoryInfo(c_resourcesDirectoryName);
+        if (m_resourcesDirectory == null)
+        {
+            Console.WriteLine($"Unable to find {c_resourcesDirectoryName} directory.");
+            throw new DirectoryNotFoundException();
+        }
+        Console.WriteLine("Resources directory found: " + m_resourcesDirectory);
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    public ReelWordsData Load()
+    {
+        Task<Trie> loadWordsTask = LoadWordsAsync();
+        Task<List<Queue<char>>> loadReelsTask = LoadReelsAsync();
+        Task.WaitAll(loadWordsTask, loadReelsTask);
+        
+        if (!loadWordsTask.IsCompletedSuccessfully || loadWordsTask.Result == null)
+        {
+            Console.WriteLine($"There was a problem initializing the language dictionary: {loadWordsTask.Exception}");
+            return null;
+        }
+        
+        if (!loadReelsTask.IsCompletedSuccessfully || loadReelsTask.Result == null)
+        {
+            Console.WriteLine($"There was a problem initializing the language dictionary: {loadReelsTask.Exception}");
+            return null;
+        }
+
+        return new ReelWordsData(words:loadWordsTask.Result, reels:loadReelsTask.Result, wordValidator:ValidateWord);
+    }
     
     //------------------------------------------------------------------------------------------------------------------
     private async Task<Trie> LoadWordsAsync()
@@ -91,19 +117,13 @@ public class DataLoader
     //------------------------------------------------------------------------------------------------------------------ 
     private Trie LoadWordsData()
     {
-        Console.WriteLine($"Initializing words for file: {m_dictionaryFileName}");
-        
-        DirectoryInfo resourcesDirectory = Utils.TryGetDirectoryInfo(c_resourcesDirectoryName);
-        if (resourcesDirectory == null)
-        {
-            Console.WriteLine($"Unable to find {c_resourcesDirectoryName} directory.");
-            return null;
-        }
-        Console.WriteLine("Resources directory found: " + resourcesDirectory);
+        Console.WriteLine($"Initializing words for file: {m_wordsFileName}");
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
         
         Trie trie = new Trie();
         int validWordsCount = 0, invalidWordsCount = 0;
-        string wordsFilePath = Path.Combine(resourcesDirectory.FullName, m_dictionaryFileName);
+        string wordsFilePath = Path.Combine(m_resourcesDirectory.FullName, m_wordsFileName);
         try
         {
             using StreamReader reader = new StreamReader(wordsFilePath);
@@ -123,14 +143,81 @@ public class DataLoader
         }
         catch (IOException ex)
         {
-            Console.WriteLine($"There was an exception reading file '{wordsFilePath}': {ex.Message}");
-            throw;
+            Console.WriteLine($"There was an exception reading the file '{wordsFilePath}': {ex.Message}");
+            return null;
         }
+        stopwatch.Stop();
         
         Console.WriteLine($"Found a total of {validWordsCount + invalidWordsCount} words in dictionary file." + 
                           $" Valid: {validWordsCount}. Invalid: {invalidWordsCount}");
-        Console.WriteLine("Words dictionary initialized successfully.");
+        
+        Console.WriteLine($"Words dictionary initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
         return trie;
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    private async Task<List<Queue<char>>> LoadReelsAsync()
+    {
+        List<Queue<char>> reels = null;
+        await Task.Run(() => { reels = LoadReelsData(); });
+        return reels;
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------ 
+    private List<Queue<char>> LoadReelsData()
+    {
+        Console.WriteLine($"Initializing reels for file: {m_reelsFileName}");
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        List<Queue<char>> reelsList = new List<Queue<char>>();
+        bool initializedReels = false;
+        string reelsFilePath = Path.Combine(m_resourcesDirectory.FullName, m_reelsFileName);
+        try
+        {
+            using StreamReader reader = new StreamReader(reelsFilePath);
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] letters = line.Split(" ");
+                if (!initializedReels)
+                {
+                    InitializeReels(letters.Length);
+                }
+
+                for (int i = 0; i < letters.Length; i++)
+                {
+                    char c = letters[i][0];
+                    reelsList[i].Enqueue(c);
+                }
+            }
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine($"There was an exception reading the file '{m_reelsFileName}': {ex.Message}");
+            return null;
+        }
+        
+        // Reels should start at random positions as a slot machine would end at random positions
+        reelsList.Shuffle();
+        
+        stopwatch.Stop();
+        
+        Console.WriteLine($"Reels initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
+        return reelsList;
+        
+        //--------------------------------------------------------------------------------------------------------------
+        // Local Methods
+        //--------------------------------------------------------------------------------------------------------------
+        void InitializeReels(int nReels)
+        {
+            for (int i = 0; i < nReels; i++)
+            {
+                reelsList.Add(new Queue<char>());
+            }
+
+            initializedReels = true;
+        }
     }
     
     //------------------------------------------------------------------------------------------------------------------
