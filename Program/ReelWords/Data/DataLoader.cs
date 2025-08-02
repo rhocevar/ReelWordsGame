@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using ReelWords.Utilities;
+using ReelWords.Validation;
 
 namespace ReelWords.Data;
 
@@ -20,7 +21,7 @@ public class DataLoader
     // Variables
     //------------------------------------------------------------------------------------------------------------------
     private DirectoryInfo m_resourcesDirectory;
-    private CharRange[] m_allowedCharacters;
+    private WordValidator m_wordValidator;
     private string m_wordsFileName;
     private string m_reelsFileName;
     
@@ -42,7 +43,7 @@ public class DataLoader
             {
                 m_wordsFileName = c_enUsFileName;
                 m_reelsFileName = c_defaultReelsFileName;
-                m_allowedCharacters = new[] { new CharRange('a', 'z') };
+                m_wordValidator = new WordValidator(languageConfig);
                 Console.WriteLine($"Language set to '{languageConfig}'");
                 break;
             }
@@ -98,7 +99,7 @@ public class DataLoader
         ReelWordsData data = new ReelWordsData(
             words: loadWordsTask.Result, 
             reels: loadReelsTask.Result,
-            wordValidator: ValidateWord
+            wordValidator: m_wordValidator.Validator
         );
 
         return data;
@@ -128,7 +129,7 @@ public class DataLoader
             string word;
             while ((word = reader.ReadLine()) != null)
             {
-                if (ValidateWord(word))
+                if (m_wordValidator.Validator(word))
                 {
                     ++validWordsCount;
                     trie.Insert(word);
@@ -216,34 +217,5 @@ public class DataLoader
 
             initializedReels = true;
         }
-    }
-    
-    //------------------------------------------------------------------------------------------------------------------
-    // Filter out invalid words: words containing characters not included in the language dictionary, one-letter words,
-    // capitalized words, null or empty words, etc.
-    private bool ValidateWord(string word)
-    {
-        if (string.IsNullOrWhiteSpace(word))
-        {
-            return false;
-        }
-        
-        if (word.Length <= 1)
-        {
-            return false;
-        }
-        
-        foreach (char c in word)
-        {
-            foreach (CharRange range in m_allowedCharacters)
-            {
-                if (c < range.Min || c > range.Max)
-                {
-                    return false;
-                }
-            }
-        }
-        
-        return true;
     }
 }
