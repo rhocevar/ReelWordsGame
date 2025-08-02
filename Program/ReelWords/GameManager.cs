@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ReelWords;
 
@@ -54,24 +55,28 @@ public class GameManager
     private static GameManager m_instance;
     private string m_dictionaryFileName;
     private CharRange[] m_allowedCharacters;
+    private Trie m_words;
     
     //------------------------------------------------------------------------------------------------------------------
     // Methods
     //------------------------------------------------------------------------------------------------------------------
     private GameManager() { }
     
+    // TODO: move file loading logic into a separate class: DataLoader
+    
     //------------------------------------------------------------------------------------------------------------------
     public void StartGame()
     {
-        // TODO: perform initialization in a separate thread
         Console.WriteLine("Game initialization started...");
-        SetLanguage(LanguageConfig.en_us);
-        Trie words = InitializeWordsData();
-        if (words == null)
+        Task initLanguageTask = InitializeLanguageAsync(LanguageConfig.en_us);
+        Task.WaitAll(initLanguageTask);
+        
+        if (!initLanguageTask.IsCompletedSuccessfully)
         {
-            Console.WriteLine($"Unable to initialize words trie for file: {m_dictionaryFileName}");
+            Console.WriteLine("There was a problem initializing the language dictionary.");
             return;
         }
+        
         Console.WriteLine("Game initialization complete.");
 
         Console.WriteLine("\n***************************\n***** Reel Words Game *****\n***************************");
@@ -95,7 +100,7 @@ public class GameManager
                 continue;
             }
             
-            bool wordExists = words.Search(input);
+            bool wordExists = m_words.Search(input);
             if (wordExists)
             {
                 // TODO: Increase score
@@ -115,6 +120,16 @@ public class GameManager
         Console.WriteLine("The Reel Words Game is over. Your total score is X.");
         Console.WriteLine("CONGRATULATIONS! WELL PLAYED!");
         Environment.Exit(0);
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    private async Task InitializeLanguageAsync(LanguageConfig languageConfig)
+    {
+        await Task.Run(() =>
+        {
+            SetLanguage(languageConfig);
+            m_words = InitializeWordsData();
+        });
     }
     
     //------------------------------------------------------------------------------------------------------------------ 
@@ -182,8 +197,8 @@ public class GameManager
         }
         catch (IOException ex)
         {
-            Console.WriteLine($"There was an exception reading file: {ex.Message}");
-            return null;
+            Console.WriteLine($"There was an exception reading file '{wordsFilePath}': {ex.Message}");
+            throw;
         }
         
         Console.WriteLine($"Found a total of {validWordsCount + invalidWordsCount} words in dictionary file." + 
@@ -193,10 +208,8 @@ public class GameManager
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// Filter out invalid words: words containing characters not included in the language dictionary, one-letter words,
-    /// capitalized words, null or empty words, etc.
-    /// </summary>
+    // Filter out invalid words: words containing characters not included in the language dictionary, one-letter words,
+    // capitalized words, null or empty words, etc.
     private bool IsWordValid(string word)
     {
         if (string.IsNullOrWhiteSpace(word))
