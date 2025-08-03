@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using ReelWords.Game;
 using ReelWords.Utilities;
 using ReelWords.Validation;
 
@@ -16,6 +17,7 @@ public class DataLoader
     private const string c_resourcesDirectoryName = "Resources";
     private const string c_enUsFileName = "american-english-large.txt";
     private const string c_defaultReelsFileName = "reels.txt";
+    private const string c_defaultScoresFileName = "scores.txt";
     
     //------------------------------------------------------------------------------------------------------------------
     // Variables
@@ -24,6 +26,7 @@ public class DataLoader
     private WordValidator m_wordValidator;
     private string m_wordsFileName;
     private string m_reelsFileName;
+    private string m_scoresFileName;
     
     //------------------------------------------------------------------------------------------------------------------
     // Methods
@@ -43,6 +46,7 @@ public class DataLoader
             {
                 m_wordsFileName = c_enUsFileName;
                 m_reelsFileName = c_defaultReelsFileName;
+                m_scoresFileName = c_defaultScoresFileName;
                 m_wordValidator = new WordValidator(languageConfig);
                 Console.WriteLine($"Language set to '{languageConfig}'");
                 break;
@@ -81,8 +85,9 @@ public class DataLoader
     public ReelWordsData Load()
     {
         Task<Trie> loadWordsTask = LoadWordsAsync();
-        Task<List<Queue<char>>> loadReelsTask = LoadReelsAsync();
-        Task.WaitAll(loadWordsTask, loadReelsTask);
+        Task<List<Queue<Tile>>> loadReelsTask = LoadReelsAsync();
+        Task<Dictionary<char, int>> loadScoresTask = LoadScoresAsync();
+        Task.WaitAll(loadWordsTask, loadReelsTask, loadScoresTask);
         
         if (!loadWordsTask.IsCompletedSuccessfully || loadWordsTask.Result == null)
         {
@@ -95,14 +100,35 @@ public class DataLoader
             Console.WriteLine($"There was a problem initializing the language dictionary: {loadReelsTask.Exception}");
             return null;
         }
+        
+        if (!loadScoresTask.IsCompletedSuccessfully || loadScoresTask.Result == null)
+        {
+            Console.WriteLine($"There was a problem initializing the scores table: {loadReelsTask.Exception}");
+            return null;
+        }
+        
+        Trie words = loadWordsTask.Result;
+        List<Queue<Tile>> reels = loadReelsTask.Result;
+        Dictionary<char, int> scores = loadScoresTask.Result;
+        
+        // Assign scores
+        foreach (Queue<Tile> reel in reels)
+        {
+            foreach (Tile tile in reel)
+            {
+                if (scores.TryGetValue(tile.Letter, out int score))
+                {
+                    tile.Score = score;
+                }
+                else
+                {
+                    Console.WriteLine($"Error: Could not find a score for letter '{tile.Letter}'");
+                    return null;
+                }
+            }
+        }
 
-        ReelWordsData data = new ReelWordsData(
-            words: loadWordsTask.Result, 
-            reels: loadReelsTask.Result,
-            wordValidator: m_wordValidator.Validator
-        );
-
-        return data;
+        return new ReelWordsData(words, reels, scores, m_wordValidator.Validator);
     }
     
     //------------------------------------------------------------------------------------------------------------------
@@ -155,21 +181,21 @@ public class DataLoader
     }
     
     //------------------------------------------------------------------------------------------------------------------
-    private async Task<List<Queue<char>>> LoadReelsAsync()
+    private async Task<List<Queue<Tile>>> LoadReelsAsync()
     {
-        List<Queue<char>> reels = null;
+        List<Queue<Tile>> reels = null;
         await Task.Run(() => { reels = LoadReelsData(); });
         return reels;
     }
     
     //------------------------------------------------------------------------------------------------------------------ 
-    private List<Queue<char>> LoadReelsData()
+    private List<Queue<Tile>> LoadReelsData()
     {
         Console.WriteLine($"Initializing reels for file: {m_reelsFileName}");
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        List<Queue<char>> reelsList = new List<Queue<char>>();
+        List<Queue<Tile>> reelsList = new List<Queue<Tile>>();
         bool initializedReels = false;
         string reelsFilePath = Path.Combine(m_resourcesDirectory.FullName, m_reelsFileName);
         try
@@ -187,7 +213,7 @@ public class DataLoader
                 for (int i = 0; i < letters.Length; i++)
                 {
                     char c = letters[i][0];
-                    reelsList[i].Enqueue(c);
+                    reelsList[i].Enqueue(new Tile(c));
                 }
             }
         }
@@ -198,7 +224,10 @@ public class DataLoader
         }
         
         // Reels should start at random positions as a slot machine would end at random positions
-        reelsList.Shuffle();
+        foreach (Queue<Tile> reel in reelsList)
+        {
+            reel.Shuffle();
+        }
         
         stopwatch.Stop();
         
@@ -212,10 +241,50 @@ public class DataLoader
         {
             for (int i = 0; i < nReels; i++)
             {
-                reelsList.Add(new Queue<char>());
+                reelsList.Add(new Queue<Tile>());
             }
 
             initializedReels = true;
         }
+    }
+        
+    //------------------------------------------------------------------------------------------------------------------
+    private async Task<Dictionary<char, int>> LoadScoresAsync()
+    {
+        Dictionary<char, int> scores = null;
+        await Task.Run(() => { scores = LoadScoresData(); });
+        return scores;
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------ 
+    private Dictionary<char, int> LoadScoresData()
+    {
+        Console.WriteLine($"Initializing scores for file: {m_scoresFileName}");
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
+        Dictionary<char, int> scores = new Dictionary<char, int>();
+        string scoresFilePath = Path.Combine(m_resourcesDirectory.FullName, m_scoresFileName);
+        try
+        {
+            using StreamReader reader = new StreamReader(scoresFilePath);
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] split = line.Split(" ");
+                char letter = split[0][0];
+                int score = int.Parse(split[1]);
+                scores.Add(letter, score);
+            }
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine($"There was an exception reading the file '{scoresFilePath}': {ex.Message}");
+            return null;
+        }
+        stopwatch.Stop();
+        
+        Console.WriteLine($"Scores table initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
+        return scores;
     }
 }

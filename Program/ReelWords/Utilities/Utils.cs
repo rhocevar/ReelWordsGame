@@ -31,17 +31,44 @@ public static class Utils
     }
     
     //------------------------------------------------------------------------------------------------------------------
-    // Fisher-Yates (Knuth) Shuffle Algorithm
-    public static void Shuffle<T>(this IList<T> list)  
+    // Shuffles a queue by rotating its elements X random times
+    public static void Shuffle<T>(this Queue<T> queue)
     {
-        Random random = new Random(); 
-        int n = list.Count;  
-        while (n > 1) {  
-            n--;  
-            int k = random.Next(n + 1);  
-            T value = list[k];  
-            list[k] = list[n];  
-            list[n] = value;  
-        }  
+        Random random = new Random();
+        int n = queue.Count;
+        int rotations = random.Next(n + 1); // Exclusive upper bound
+
+        for (int i = 0; i < rotations; i++)
+        {
+            T item = queue.Dequeue();
+            queue.Enqueue(item);
+        }
     }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    public static string ToSubscript(this int number)
+    {
+        string subscriptNumber = "";
+        
+        string numberStr = number.ToString();
+        foreach (char c in numberStr)
+        {
+            switch (c)
+            {
+                case '0': subscriptNumber += '₀'; break;
+                case '1': subscriptNumber += '₁'; break;
+                case '2': subscriptNumber += '₂'; break;
+                case '3': subscriptNumber += '₃'; break;
+                case '4': subscriptNumber += '₄'; break;
+                case '5': subscriptNumber += '₅'; break;
+                case '6': subscriptNumber += '₆'; break;
+                case '7': subscriptNumber += '₇'; break;
+                case '8': subscriptNumber += '₈'; break;
+                case '9': subscriptNumber += '₉'; break;
+            }
+        }
+
+        return subscriptNumber;
+    }
+    
 }

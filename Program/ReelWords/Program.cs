@@ -10,7 +10,8 @@ public static class Program
     //------------------------------------------------------------------------------------------------------------------
     static void Main(string[] args)
     {
-        // The language config can be defined via args. Setting it to english as default for simplicity.
+        // The language config can be defined upon launching the game (e.g. via args).
+        // Setting it to american english as the default for simplicity.
         LanguageConfig languageConfig = LanguageConfig.en_us;
         
         GameManager.Instance.Initialize(languageConfig);
