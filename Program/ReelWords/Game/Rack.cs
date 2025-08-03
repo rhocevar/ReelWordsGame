@@ -47,20 +47,16 @@ public class Rack
         m_stringBuilder.Clear();
 
         m_stringBuilder.Append("\n------------------------------------\n");
-        
         m_stringBuilder.Append("    ");
-        foreach (Tile t in m_rack)
+        foreach (Tile tile in m_rack)
         {
-            m_stringBuilder.Append(" ");
-            string letter = t.ToString().ToUpper();
-            m_stringBuilder.Append(letter);
-            m_stringBuilder.Append(" ");
+            m_stringBuilder.Append($" {tile} ");
         }
-        m_stringBuilder.Append("    \n");
+        m_stringBuilder.Append("    ");
+        m_stringBuilder.Append("\n------------------------------------");
 
-        m_stringBuilder.Append("------------------------------------");
-        
-        Console.WriteLine(m_stringBuilder.ToString());
+        string output = m_stringBuilder.ToString();
+        Console.WriteLine(output);
     }
     
     //------------------------------------------------------------------------------------------------------------------
