@@ -46,7 +46,7 @@ public class Rack
     {
         m_stringBuilder.Clear();
 
-        m_stringBuilder.Append("\n------------------------------------\n");
+        m_stringBuilder.Append("------------------------------------\n");
         m_stringBuilder.Append("    ");
         foreach (Tile tile in m_rack)
         {
@@ -60,8 +60,9 @@ public class Rack
     }
     
     //------------------------------------------------------------------------------------------------------------------
-    public bool TryPlay(string word)
+    public bool TryPlay(string word, out int score)
     {
+        score = 0;
         // Check if the player has enough letters on their rack to create this word
         if (m_rack.Count < word.Length)
         {
@@ -91,7 +92,7 @@ public class Rack
         }
 
         // If we reached this far, the play was successful.
-        // Update the reels correspondent to the tiles that have been used
+        // Update the reels correspondent to the tiles that have been used and calculate the score
         for (int i = 0; i < tempRack.Count; i++)
         {
             char tileLetter = tempRack[i];
@@ -100,6 +101,8 @@ public class Rack
                 Queue<Tile> reel = m_reels[i];
                 Tile tile = reel.Dequeue();
                 reel.Enqueue(tile);
+
+                score += tile.Score;
             }
         }
 

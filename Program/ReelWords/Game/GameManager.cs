@@ -29,6 +29,7 @@ public class GameManager
     private DataLoader m_dataLoader;
     private ReelWordsData m_data;
     private Rack m_rack;
+    private int m_totalScore;
     
     //------------------------------------------------------------------------------------------------------------------
     // Methods
@@ -52,6 +53,7 @@ public class GameManager
         }
 
         m_rack = new Rack(m_data.Reels);
+        m_totalScore = 0;
         
         stopwatch.Stop();
         
@@ -66,9 +68,10 @@ public class GameManager
     private void StartGame()
     {
         Console.WriteLine("\n***************************\n***** Reel Words Game *****\n***************************");
-        Console.WriteLine("--> Type '0' to end the game."); 
+        Console.WriteLine("--> Type '0' to end the game.\n"); 
         while (true)
         {
+            Console.WriteLine($"Total score: {m_totalScore}");
             m_rack.Display();
             
             Console.Write("Create a word using the letters from your tray: ");
@@ -103,10 +106,10 @@ public class GameManager
             bool wordExists = m_data.Words.Search(inputLower);
             if (wordExists)
             {
-                if (m_rack.TryPlay(inputLower))
+                if (m_rack.TryPlay(inputLower, out int score))
                 {
-                    // TODO: Increase score
-                    Console.WriteLine($"Good job! You earned X points from the word '{inputUpper}'.");
+                    m_totalScore += score;
+                    Console.WriteLine($"Good job! You earned {score} points from the word '{inputUpper}'.");
                 }
                 else
                 {
@@ -123,7 +126,7 @@ public class GameManager
     //------------------------------------------------------------------------------------------------------------------
     private void EndGame()
     {
-        Console.WriteLine("The Reel Words Game is over. Your total score is X.");
+        Console.WriteLine($"\nThe Reel Words Game is over. Your total score is {m_totalScore}.");
         Console.WriteLine("CONGRATULATIONS! WELL PLAYED!");
         Environment.Exit(0);
     }
