@@ -55,7 +55,7 @@ public class Trie
     // Variables
     //------------------------------------------------------------------------------------------------------------------
     private readonly Node m_root = new (c_rootChar);
-    private readonly Node m_endOfWord = new (c_endOfWordChar);
+    private readonly Node m_endOfWord = new (c_endOfWordChar); // Only one end of word node (can be referenced multiple times)
     private int m_numberOfNodes = 1; // Only considering the root
         
     //------------------------------------------------------------------------------------------------------------------
