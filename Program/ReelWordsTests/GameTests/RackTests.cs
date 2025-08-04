@@ -11,6 +11,8 @@ public class RackTests
     //------------------------------------------------------------------------------------------------------------------
     // Constants
     //------------------------------------------------------------------------------------------------------------------
+    private const string c_testWordSuccess = "program";
+    private const string c_testWordFail = "walnut";
     private const int c_rows = 6;
     private const int c_columns = 7;
     private readonly char[,] c_reelsTest = new char[c_rows, c_columns]{ 
@@ -21,8 +23,6 @@ public class RackTests
         { 'c', 'd', 'e', 'f', 'g', 'h', 'i' }, 
         { 'j', 'k', 'l', 'm', 'n', 'o', 'p' }
     };
-    private const string c_testWordSuccess = "program";
-    private const string c_testWordFail = "walnut";
     
     //------------------------------------------------------------------------------------------------------------------
     // Variables

@@ -84,6 +84,8 @@ public class GameManager
                 {
                     continue;
                 }
+
+                input = input.Trim();
                 
                 if (input == "0")
                 {
