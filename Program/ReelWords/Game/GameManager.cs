@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using ReelWords.Data;
+using ReelWords.View;
 
 namespace ReelWords.Game;
 
@@ -26,6 +27,7 @@ public class GameManager
     // Variables
     //------------------------------------------------------------------------------------------------------------------
     private static GameManager m_instance;
+    private IView m_view;
     private DataLoader m_dataLoader;
     private ReelWordsData m_data;
     private Rack m_rack;
@@ -37,48 +39,48 @@ public class GameManager
     private GameManager() { }
     
     //------------------------------------------------------------------------------------------------------------------
-    public void Initialize(LanguageConfig languageConfig)
+    public void Initialize(IView view, LanguageConfig languageConfig)
     {
-        Console.WriteLine("Initializing game data...");
+        m_view = view;
+        
+        view.DisplayTextLine("Initializing game data...");
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         
-        m_dataLoader = new DataLoader(languageConfig);
+        m_dataLoader = new DataLoader(languageConfig, view);
         
         m_data = m_dataLoader.Load();
         if (m_data == null)
         {
-            Console.WriteLine("There was a problem loading the game data.");
+            view.DisplayTextLine("There was a problem loading the game data.");
             return;
         }
 
-        m_rack = new Rack(m_data.Reels);
+        m_rack = new Rack(m_data.Reels, view);
         m_totalScore = 0;
         
         stopwatch.Stop();
         
-        Console.WriteLine($"Game data initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
+        view.DisplayTextLine($"Game data initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
         
         StartGame();
     }
     
     //------------------------------------------------------------------------------------------------------------------
-    // TODO: consider moving all view related function to a View class.
-    // Could maybe created an interface IView, and a class ConsoleView that implements it
     private void StartGame()
     {
-        Console.WriteLine("\n***************************\n***** Reel Words Game *****\n***************************");
-        Console.WriteLine("--> Type '0' to end the game.\n"); 
+        m_view.DisplayTextLine("\n***************************\n***** Reel Words Game *****\n***************************");
+        m_view.DisplayTextLine("--> Type '0' to end the game.\n"); 
         while (true)
         {
-            Console.WriteLine($"Total score: {m_totalScore}");
+            m_view.DisplayTextLine($"Total score: {m_totalScore}");
             m_rack.Display();
             
-            Console.Write("Create a word using the letters from your tray: ");
+            m_view.DisplayText("Create a word using the letters from your tray: ");
             string input;
             while (true)
             {
-                input = Console.ReadLine();
+                input = m_view.ReadTextLine();
 
                 if (string.IsNullOrWhiteSpace(input))
                 {
@@ -99,7 +101,7 @@ public class GameManager
             
             if (!m_data.IsWordValid(inputLower))
             {
-                Console.WriteLine($"The word '{inputUpper}' is not valid.");
+                m_view.DisplayTextLine($"The word '{inputUpper}' is not valid.");
                 continue;
             }
             
@@ -109,16 +111,16 @@ public class GameManager
                 if (m_rack.TryPlay(inputLower, out int score))
                 {
                     m_totalScore += score;
-                    Console.WriteLine($"Good job! You earned {score} points from the word '{inputUpper}'.");
+                    m_view.DisplayTextLine($"Good job! You earned {score} points from the word '{inputUpper}'.");
                 }
                 else
                 {
-                    Console.WriteLine($"The word '{inputUpper}' can't be created using the letters from your tray.");
+                    m_view.DisplayTextLine($"The word '{inputUpper}' can't be created using the letters from your tray.");
                 }
             }
             else
             {
-                Console.WriteLine($"The word '{inputUpper}' does not exist in the dictionary.");
+                m_view.DisplayTextLine($"The word '{inputUpper}' does not exist in the dictionary.");
             }
         }
     }
@@ -126,8 +128,8 @@ public class GameManager
     //------------------------------------------------------------------------------------------------------------------
     private void EndGame()
     {
-        Console.WriteLine($"\nThe Reel Words Game is over. Your total score is {m_totalScore}.");
-        Console.WriteLine("CONGRATULATIONS! WELL PLAYED!");
+        m_view.DisplayTextLine($"\nThe Reel Words Game is over. Your total score is {m_totalScore}.");
+        m_view.DisplayTextLine("CONGRATULATIONS! WELL PLAYED!");
         Environment.Exit(0);
     }
 }
