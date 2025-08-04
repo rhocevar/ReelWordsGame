@@ -7,8 +7,9 @@ namespace ReelWords.View;
 public class ConsoleView : IView
 {
     //------------------------------------------------------------------------------------------------------------------
-    // Methods
+    // Variables
     //------------------------------------------------------------------------------------------------------------------
+    private TextReader m_in;
     private TextWriter m_out;
     
     //------------------------------------------------------------------------------------------------------------------
@@ -17,12 +18,25 @@ public class ConsoleView : IView
     public ConsoleView(Encoding encoding)
     {
         Console.OutputEncoding = encoding;
+        m_in = Console.In;
         m_out = Console.Out;
     }
     
     //------------------------------------------------------------------------------------------------------------------
     public void DisplayText(string text)
     {
+        m_out.Write(text);
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    public void DisplayTextLine(string text)
+    {
         m_out.WriteLine(text);
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    public string ReadTextLine()
+    {
+        return m_in.ReadLine();
     }
 }

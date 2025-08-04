@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ReelWords.View;
 
 namespace ReelWords.Game;
 
@@ -18,13 +18,15 @@ public class Rack
     private List<Queue<Tile>> m_reels;
     private List<Tile> m_rack;
     private StringBuilder m_stringBuilder;
+    private IView m_view;
     
     //------------------------------------------------------------------------------------------------------------------
     // Methods
     //------------------------------------------------------------------------------------------------------------------
-    public Rack(List<Queue<Tile>> reels)
+    public Rack(List<Queue<Tile>> reels, IView view)
     {
         m_reels = reels;
+        m_view = view;
         m_rack = new List<Tile>();
         m_stringBuilder = new StringBuilder();
         Update();
@@ -54,9 +56,8 @@ public class Rack
         }
         m_stringBuilder.Append("    ");
         m_stringBuilder.Append("\n------------------------------------");
-
-        string output = m_stringBuilder.ToString();
-        Console.WriteLine(output);
+        
+        m_view.DisplayTextLine(m_stringBuilder.ToString());
     }
     
     //------------------------------------------------------------------------------------------------------------------

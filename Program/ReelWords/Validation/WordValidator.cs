@@ -29,11 +29,11 @@ public class WordValidator
                 Validator = ValidateWord_Latin;
                 break;
             }
-            // Other languages may have a different set of allowed characters (e.g. zh-cn, de, ja, ko, ...)
+            // Other languages may have a different set of allowed characters and validation rules
+            // e.g. zh-cn, de, ja, ko, etc...
             default:
             {
-                Console.WriteLine($"Language config {languageConfig} is not yet supported.");
-                throw new NotImplementedException();
+                throw new NotImplementedException($"Language config {languageConfig} is not yet supported.");
             }
         }
     }

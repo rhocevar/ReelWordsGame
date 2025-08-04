@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ReelWords.Game;
 using ReelWords.Utilities;
 using ReelWords.Validation;
+using ReelWords.View;
 
 namespace ReelWords.Data;
 
@@ -24,6 +25,7 @@ public class DataLoader
     //------------------------------------------------------------------------------------------------------------------
     private DirectoryInfo m_resourcesDirectory;
     private WordValidator m_wordValidator;
+    private IView m_view;
     private string m_wordsFileName;
     private string m_reelsFileName;
     private string m_scoresFileName;
@@ -31,8 +33,9 @@ public class DataLoader
     //------------------------------------------------------------------------------------------------------------------
     // Methods
     //------------------------------------------------------------------------------------------------------------------
-    public DataLoader(LanguageConfig languageConfig)
+    public DataLoader(LanguageConfig languageConfig, IView view)
     {
+        m_view = view;
         SetLanguage(languageConfig);
         SetResourcesDirectory();
     }
@@ -48,22 +51,22 @@ public class DataLoader
                 m_reelsFileName = c_defaultReelsFileName;
                 m_scoresFileName = c_defaultScoresFileName;
                 m_wordValidator = new WordValidator(languageConfig);
-                Console.WriteLine($"Language set to '{languageConfig}'");
+                m_view.DisplayTextLine($"Language set to '{languageConfig}'");
                 break;
             }
             case LanguageConfig.en_gb:
             {
-                Console.WriteLine($"Language config {languageConfig} is not yet supported.");
+                m_view.DisplayTextLine($"Language config {languageConfig} is not yet supported.");
                 throw new NotImplementedException();
             }
             case LanguageConfig.pt_br:
             {
-                Console.WriteLine($"Language config {languageConfig} is not yet supported.");
+                m_view.DisplayTextLine($"Language config {languageConfig} is not yet supported.");
                 throw new NotImplementedException();
             }
             default:
             {
-                Console.WriteLine($"Language config {languageConfig} is not yet supported.");
+                m_view.DisplayTextLine($"Language config {languageConfig} is not yet supported.");
                 throw new NotImplementedException();
             }
         }
@@ -75,10 +78,10 @@ public class DataLoader
         m_resourcesDirectory = Utils.TryGetDirectoryInfo(c_resourcesDirectoryName);
         if (m_resourcesDirectory == null)
         {
-            Console.WriteLine($"Unable to find {c_resourcesDirectoryName} directory.");
+            m_view.DisplayTextLine($"Unable to find {c_resourcesDirectoryName} directory.");
             throw new DirectoryNotFoundException();
         }
-        Console.WriteLine("Resources directory found: " + m_resourcesDirectory);
+        m_view.DisplayTextLine("Resources directory found: " + m_resourcesDirectory);
     }
     
     //------------------------------------------------------------------------------------------------------------------
@@ -91,19 +94,19 @@ public class DataLoader
         
         if (!loadWordsTask.IsCompletedSuccessfully || loadWordsTask.Result == null)
         {
-            Console.WriteLine($"There was a problem initializing the language dictionary: {loadWordsTask.Exception}");
+            m_view.DisplayTextLine($"There was a problem initializing the language dictionary: {loadWordsTask.Exception}");
             return null;
         }
         
         if (!loadReelsTask.IsCompletedSuccessfully || loadReelsTask.Result == null)
         {
-            Console.WriteLine($"There was a problem initializing the language dictionary: {loadReelsTask.Exception}");
+            m_view.DisplayTextLine($"There was a problem initializing the language dictionary: {loadReelsTask.Exception}");
             return null;
         }
         
         if (!loadScoresTask.IsCompletedSuccessfully || loadScoresTask.Result == null)
         {
-            Console.WriteLine($"There was a problem initializing the scores table: {loadReelsTask.Exception}");
+            m_view.DisplayTextLine($"There was a problem initializing the scores table: {loadReelsTask.Exception}");
             return null;
         }
         
@@ -122,13 +125,13 @@ public class DataLoader
                 }
                 else
                 {
-                    Console.WriteLine($"Error: Could not find a score for letter '{tile.Letter}'");
+                    m_view.DisplayTextLine($"Error: Could not find a score for letter '{tile.Letter}'");
                     return null;
                 }
             }
         }
 
-        return new ReelWordsData(words, reels, scores, m_wordValidator.Validator);
+        return new ReelWordsData(words, reels, m_wordValidator.Validator);
     }
     
     //------------------------------------------------------------------------------------------------------------------
@@ -142,7 +145,7 @@ public class DataLoader
     //------------------------------------------------------------------------------------------------------------------ 
     private Trie LoadWordsData()
     {
-        Console.WriteLine($"Initializing words for file: {m_wordsFileName}");
+        m_view.DisplayTextLine($"Initializing words for file: {m_wordsFileName}");
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         
@@ -168,15 +171,15 @@ public class DataLoader
         }
         catch (IOException ex)
         {
-            Console.WriteLine($"There was an exception reading the file '{wordsFilePath}': {ex.Message}");
+            m_view.DisplayTextLine($"There was an exception reading the file '{wordsFilePath}': {ex.Message}");
             return null;
         }
         stopwatch.Stop();
         
-        Console.WriteLine($"Found a total of {validWordsCount + invalidWordsCount} words in dictionary file." + 
-                          $" Valid: {validWordsCount}. Invalid: {invalidWordsCount}");
+        m_view.DisplayTextLine($"Found a total of {validWordsCount + invalidWordsCount} words in dictionary file." + 
+                               $" Valid: {validWordsCount}. Invalid: {invalidWordsCount}");
         
-        Console.WriteLine($"Words dictionary initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
+        m_view.DisplayTextLine($"Words dictionary initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
         return trie;
     }
     
@@ -191,7 +194,7 @@ public class DataLoader
     //------------------------------------------------------------------------------------------------------------------ 
     private List<Queue<Tile>> LoadReelsData()
     {
-        Console.WriteLine($"Initializing reels for file: {m_reelsFileName}");
+        m_view.DisplayTextLine($"Initializing reels for file: {m_reelsFileName}");
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
 
@@ -219,7 +222,7 @@ public class DataLoader
         }
         catch (IOException ex)
         {
-            Console.WriteLine($"There was an exception reading the file '{m_reelsFileName}': {ex.Message}");
+            m_view.DisplayTextLine($"There was an exception reading the file '{m_reelsFileName}': {ex.Message}");
             return null;
         }
         
@@ -231,7 +234,7 @@ public class DataLoader
         
         stopwatch.Stop();
         
-        Console.WriteLine($"Reels initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
+        m_view.DisplayTextLine($"Reels initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
         return reelsList;
         
         //--------------------------------------------------------------------------------------------------------------
@@ -259,7 +262,7 @@ public class DataLoader
     //------------------------------------------------------------------------------------------------------------------ 
     private Dictionary<char, int> LoadScoresData()
     {
-        Console.WriteLine($"Initializing scores for file: {m_scoresFileName}");
+        m_view.DisplayTextLine($"Initializing scores for file: {m_scoresFileName}");
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         
@@ -279,12 +282,12 @@ public class DataLoader
         }
         catch (IOException ex)
         {
-            Console.WriteLine($"There was an exception reading the file '{scoresFilePath}': {ex.Message}");
+            m_view.DisplayTextLine($"There was an exception reading the file '{scoresFilePath}': {ex.Message}");
             return null;
         }
         stopwatch.Stop();
         
-        Console.WriteLine($"Scores table initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
+        m_view.DisplayTextLine($"Scores table initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
         return scores;
     }
 }

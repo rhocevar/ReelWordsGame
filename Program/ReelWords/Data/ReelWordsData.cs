@@ -11,7 +11,6 @@ public class ReelWordsData
     //------------------------------------------------------------------------------------------------------------------
     public Trie Words { get; }
     public List<Queue<Tile>> Reels { get; }
-    public Dictionary<char, int> Scores { get; }
     public Func<string, bool> IsWordValid { get; }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -19,13 +18,11 @@ public class ReelWordsData
     //------------------------------------------------------------------------------------------------------------------
     public ReelWordsData(
         Trie words, 
-        List<Queue<Tile>> reels, 
-        Dictionary<char, int> scores,
+        List<Queue<Tile>> reels,
         Func<string, bool> wordValidator)
     {
         Words = words;
         Reels = reels;
-        Scores = scores;
         IsWordValid = wordValidator;
     }
 }
