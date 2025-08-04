@@ -16,4 +16,8 @@
       <ProjectReference Include="..\ReelWords\ReelWords.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ResourcesTest\" />
+    </ItemGroup>
+
 </Project>

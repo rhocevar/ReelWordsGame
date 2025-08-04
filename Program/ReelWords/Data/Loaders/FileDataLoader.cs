@@ -16,7 +16,6 @@ public class FileDataLoader : IDataLoader
     //------------------------------------------------------------------------------------------------------------------
     // Constants
     //------------------------------------------------------------------------------------------------------------------
-    private const string c_resourcesDirectoryName = "Resources";
     private const string c_enUsFileName = "american-english-large.txt";
     private const string c_defaultReelsFileName = "reels.txt";
     private const string c_defaultScoresFileName = "scores.txt";
@@ -34,11 +33,11 @@ public class FileDataLoader : IDataLoader
     //------------------------------------------------------------------------------------------------------------------
     // Methods
     //------------------------------------------------------------------------------------------------------------------
-    public FileDataLoader(LanguageConfig languageConfig, IView view)
+    public FileDataLoader(LanguageConfig languageConfig, IView view, string directoryName)
     {
         m_view = view;
         SetLanguage(languageConfig);
-        SetResourcesDirectory();
+        SetDirectory(directoryName);
     }
     
     //------------------------------------------------------------------------------------------------------------------ 
@@ -74,12 +73,12 @@ public class FileDataLoader : IDataLoader
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    private void SetResourcesDirectory()
+    private void SetDirectory(string directoryName)
     {
-        m_resourcesDirectory = Utils.TryGetDirectoryInfo(c_resourcesDirectoryName);
+        m_resourcesDirectory = Utils.TryGetDirectoryInfo(directoryName);
         if (m_resourcesDirectory == null)
         {
-            m_view.DisplayTextLine($"Unable to find {c_resourcesDirectoryName} directory.");
+            m_view.DisplayTextLine($"Unable to find {directoryName} directory.");
             throw new DirectoryNotFoundException();
         }
         m_view.DisplayTextLine("Resources directory found: " + m_resourcesDirectory);

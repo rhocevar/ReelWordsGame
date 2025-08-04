@@ -24,7 +24,7 @@ public static class Program
         
         // The default data loader for this game is the file data loader. We could create a new type of loader that
         // pulls data from a different source, such as a database, as long as it implements the IDataLoader interface.
-        IDataLoader fileDataLoader = new FileDataLoader(languageConfig, consoleView);
+        IDataLoader fileDataLoader = new FileDataLoader(languageConfig, consoleView, directoryName:"Resources");
         
         GameManager.Instance.Initialize(consoleView, fileDataLoader);
     }
