@@ -178,7 +178,8 @@ public class FileDataLoader : IDataLoader
         stopwatch.Stop();
         
         m_view.DisplayTextLine($"Found a total of {validWordsCount + invalidWordsCount} words in dictionary file." + 
-                               $" Valid: {validWordsCount}. Invalid: {invalidWordsCount}");
+                               $" Valid: {validWordsCount}. Invalid: {invalidWordsCount}." + 
+                               $" Number of nodes: {trie.Count}");
         
         m_view.DisplayTextLine($"Words dictionary initialized successfully ({stopwatch.Elapsed.TotalMilliseconds}ms)");
         return trie;

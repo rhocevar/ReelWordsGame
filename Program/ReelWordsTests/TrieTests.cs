@@ -5,27 +5,84 @@ namespace ReelWordsTests;
 
 public class TrieTests
 {
-    // TODO:  Create simple unit tests to test your code in the ReelWordsTests project,
-    // don't worry about creating tests for everything, just important functions as
-    // seen for the Trie tests
+    //------------------------------------------------------------------------------------------------------------------
+    // Constants
+    //------------------------------------------------------------------------------------------------------------------
+    private const string c_singleWord = "parallel";
+    private readonly string[] m_multipleWords =
+    {
+        "can",
+        "carts",
+        "cart",
+        "cats",
+        "card"
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Variables
+    //------------------------------------------------------------------------------------------------------------------
+    private readonly Trie m_trie;
     
-    private const string TEST_WORD = "parallel";
-
-    [Fact]
-    public void TrieInsertTest()
+    //------------------------------------------------------------------------------------------------------------------
+    // Methods
+    //------------------------------------------------------------------------------------------------------------------
+    public TrieTests()
     {
-        Trie trie = new Trie();
-        trie.Insert(TEST_WORD);
-        Assert.True(trie.Search(TEST_WORD));
+        // Create a new trie before each test
+        m_trie = new Trie();
     }
-
+    
+    //------------------------------------------------------------------------------------------------------------------
     [Fact]
-    public void TrieDeleteTest()
+    public void TrieInsertTest_SingleWord()
     {
-        Trie trie = new Trie();
-        trie.Insert(TEST_WORD);
-        Assert.True(trie.Search(TEST_WORD));
-        trie.Delete(TEST_WORD);
-        Assert.False(trie.Search(TEST_WORD));
+        m_trie.Insert(c_singleWord);
+        Assert.True(m_trie.Search(c_singleWord));
+        Assert.True(m_trie.Count == c_singleWord.Length + 1); // Also considering the root
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    [Fact]
+    public void TrieDeleteTest_SingleWord()
+    {
+        m_trie.Insert(c_singleWord);
+        m_trie.Delete(c_singleWord);
+        Assert.False(m_trie.Search(c_singleWord));
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    [Fact]
+    public void TrieInsertTest_MultipleWords()
+    {
+        foreach (string word in m_multipleWords)
+        {
+            m_trie.Insert(word);
+        }
+        
+        foreach (string word in m_multipleWords)
+        {
+            Assert.True(m_trie.Search(word));
+        }
+
+        Assert.True(m_trie.Count == 10);
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    [Fact]
+    public void TrieDeleteTest_MultipleWords()
+    {
+        foreach (string word in m_multipleWords)
+        {
+            m_trie.Insert(word);
+            Assert.True(m_trie.Search(word));
+        }
+        
+        foreach (string word in m_multipleWords)
+        {
+            m_trie.Delete(word);
+            Assert.False(m_trie.Search(word));
+        }
+        
+        Assert.True(m_trie.Count == 1); // Only the root node should be left
     }
 }

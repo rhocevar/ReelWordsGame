@@ -34,7 +34,12 @@ public class Trie
             Children.Add(newChild.m_character, newChild);
         }
     }
-        
+       
+    //------------------------------------------------------------------------------------------------------------------
+    // Properties
+    //------------------------------------------------------------------------------------------------------------------
+    public int Count => m_numberOfNodes;
+    
     //------------------------------------------------------------------------------------------------------------------
     // Constants
     //------------------------------------------------------------------------------------------------------------------
@@ -44,8 +49,9 @@ public class Trie
     //------------------------------------------------------------------------------------------------------------------
     // Variables
     //------------------------------------------------------------------------------------------------------------------
-    private readonly Node m_root = new Node(c_rootChar);
-    private readonly Node m_endOfWord = new Node(c_endOfWordChar); 
+    private readonly Node m_root = new (c_rootChar);
+    private readonly Node m_endOfWord = new (c_endOfWordChar);
+    private int m_numberOfNodes = 1; // Only considering the root
         
     //------------------------------------------------------------------------------------------------------------------
     // Methods
@@ -64,6 +70,8 @@ public class Trie
                 Node newChild = new Node(c);
                 currentNode.AddChild(newChild);
                 currentNode = newChild;
+
+                ++m_numberOfNodes;
             }
         }
             
@@ -125,6 +133,7 @@ public class Trie
             if (shouldDeleteWord)
             {
                 node.Children.Remove(childKey);
+                --m_numberOfNodes;
 
                 // Delete the current node if it has no other children
                 if (node.Children.Count == 0 && node != m_root)
