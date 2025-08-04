@@ -11,6 +11,16 @@ using ReelWords.View;
 
 namespace ReelWords.Data.Loaders;
 
+/// <summary>
+/// Loads data asynchronously from multiple files contained in the specified directory. A directory with the given name
+/// should be present upward in the directory tree and contain the files for the dictionary, reels and scores.
+/// 
+/// A language can be specific on initialization, so that the files correspondent to that language will be used for the
+/// data load. For this assessment, only american english (en-us) is supported.
+/// 
+/// The Load function return a 'ReelWordsData' data structure which contains the words added to a Trie data structure,
+/// the reels and a word validator for the specified language.
+/// </summary>
 public class FileDataLoader : IDataLoader
 {
     //------------------------------------------------------------------------------------------------------------------
@@ -23,9 +33,9 @@ public class FileDataLoader : IDataLoader
     //------------------------------------------------------------------------------------------------------------------
     // Variables
     //------------------------------------------------------------------------------------------------------------------
+    private readonly IView m_view;
     private DirectoryInfo m_resourcesDirectory;
     private WordValidator m_wordValidator;
-    private IView m_view;
     private string m_wordsFileName;
     private string m_reelsFileName;
     private string m_scoresFileName;
@@ -131,7 +141,7 @@ public class FileDataLoader : IDataLoader
             }
         }
 
-        return new ReelWordsData(words, reels, m_wordValidator.Validator);
+        return new ReelWordsData(words, reels, m_wordValidator);
     }
     
     //------------------------------------------------------------------------------------------------------------------
@@ -158,7 +168,7 @@ public class FileDataLoader : IDataLoader
             string word;
             while ((word = reader.ReadLine()) != null)
             {
-                if (m_wordValidator.Validator(word))
+                if (m_wordValidator.IsValid(word))
                 {
                     ++validWordsCount;
                     trie.Insert(word);

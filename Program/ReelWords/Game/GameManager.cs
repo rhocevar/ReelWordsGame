@@ -6,6 +6,9 @@ using ReelWords.View;
 
 namespace ReelWords.Game;
 
+/// <summary>
+/// Handles the core game logic such as initializing, playing and ending a game
+/// </summary>
 public class GameManager
 {
     //------------------------------------------------------------------------------------------------------------------
@@ -68,7 +71,13 @@ public class GameManager
     private void StartGame()
     {
         m_view.DisplayTextLine("\n***************************\n***** Reel Words Game *****\n***************************");
-        m_view.DisplayTextLine("--> Type '0' to end the game.\n"); 
+        m_view.DisplayTextLine("--> Type '0' to end the game.\n");
+        PlayLoop();
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    private void PlayLoop()
+    {
         while (true)
         {
             m_view.DisplayTextLine($"Total score: {m_totalScore}");
@@ -99,7 +108,7 @@ public class GameManager
             string inputLower = input.ToLower(); // Lower case used for data validation
             string inputUpper = input.ToUpper(); // Upper case used for display
             
-            if (!m_data.IsWordValid(inputLower))
+            if (!m_data.Validator.IsValid(inputLower))
             {
                 m_view.DisplayTextLine($"The word '{inputUpper}' is not valid.");
                 continue;

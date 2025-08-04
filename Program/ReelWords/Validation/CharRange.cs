@@ -2,6 +2,9 @@ using System;
 
 namespace ReelWords.Validation;
 
+/// <summary>
+/// Determine a valid range of characters (letters) that can be used in the game.
+/// </summary>
 public class CharRange
 {
     //------------------------------------------------------------------------------------------------------------------

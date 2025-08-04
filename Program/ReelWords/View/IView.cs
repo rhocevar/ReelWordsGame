@@ -1,5 +1,8 @@
 namespace ReelWords.View;
 
+/// <summary>
+/// Abstraction of a View entity
+/// </summary>
 public interface IView
 {
     //------------------------------------------------------------------------------------------------------------------

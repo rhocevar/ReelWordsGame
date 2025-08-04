@@ -6,6 +6,9 @@ using ReelWords.View;
 
 namespace ReelWords;
 
+/// <summary>
+/// Bootstrap class for the ReelWords game
+/// </summary>
 public static class Program
 {
     //------------------------------------------------------------------------------------------------------------------

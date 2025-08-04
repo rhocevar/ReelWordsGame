@@ -9,7 +9,7 @@ public class WordValidatorTests
     //------------------------------------------------------------------------------------------------------------------
     // Variables
     //------------------------------------------------------------------------------------------------------------------
-    private WordValidator m_wordValidatorEnUs;
+    private readonly WordValidator m_wordValidatorEnUs;
     
     //------------------------------------------------------------------------------------------------------------------
     // Methods
@@ -29,7 +29,7 @@ public class WordValidatorTests
     [InlineData("zebra")]
     public void ValidateWordTest_Success(string word)
     {
-        Assert.True(m_wordValidatorEnUs.Validator(word));
+        Assert.True(m_wordValidatorEnUs.IsValid(word));
     }
     
     //------------------------------------------------------------------------------------------------------------------
@@ -46,6 +46,6 @@ public class WordValidatorTests
     [InlineData("éclair")]
     public void ValidateWordTest_Fail(string word)
     {
-        Assert.False(m_wordValidatorEnUs.Validator(word));
+        Assert.False(m_wordValidatorEnUs.IsValid(word));
     }
 }

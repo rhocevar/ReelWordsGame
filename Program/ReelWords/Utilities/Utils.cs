@@ -70,5 +70,4 @@ public static class Utils
 
         return subscriptNumber;
     }
-    
 }

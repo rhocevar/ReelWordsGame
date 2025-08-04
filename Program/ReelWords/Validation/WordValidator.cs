@@ -3,17 +3,17 @@ using ReelWords.Config;
 
 namespace ReelWords.Validation;
 
+/// <summary>
+/// Validate words for a specified language config. Each language can have their own rules for validating words such as
+/// allowing different character sets/ranges or allowing certain Unicode characters.
+/// </summary>
 public class WordValidator
 {
     //------------------------------------------------------------------------------------------------------------------
-    // Properties
-    //------------------------------------------------------------------------------------------------------------------
-    public Func<string, bool> Validator { get; private set; }
-    
-    //------------------------------------------------------------------------------------------------------------------
     // Variables
     //------------------------------------------------------------------------------------------------------------------
-    private CharRange[] m_allowedCharacters;
+    private readonly CharRange[] m_allowedCharacters;
+    private readonly Func<string, bool> m_validator;
 
     //------------------------------------------------------------------------------------------------------------------
     // Methods
@@ -26,7 +26,7 @@ public class WordValidator
             case LanguageConfig.en_gb:
             case LanguageConfig.pt_br: {
                 m_allowedCharacters = new[] { new CharRange('a', 'z') };
-                Validator = ValidateWord_Latin;
+                m_validator = ValidateWord_Latin;
                 break;
             }
             // Other languages may have a different set of allowed characters and validation rules
@@ -36,6 +36,12 @@ public class WordValidator
                 throw new NotImplementedException($"Language config {languageConfig} is not yet supported.");
             }
         }
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    public bool IsValid(string word)
+    {
+        return m_validator(word);
     }
     
     //------------------------------------------------------------------------------------------------------------------

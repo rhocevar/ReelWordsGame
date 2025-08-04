@@ -5,6 +5,9 @@ using ReelWords.View;
 
 namespace ReelWords.Game;
 
+/// <summary>
+/// The Rack class represents the player's tile holder, which contains the letters available for the current play
+/// </summary>
 public class Rack
 {
     //------------------------------------------------------------------------------------------------------------------
@@ -13,17 +16,17 @@ public class Rack
     public List<Tile> CurrentRack => m_rack;
     
     //------------------------------------------------------------------------------------------------------------------
-    // Variables
+    // Constants
     //------------------------------------------------------------------------------------------------------------------
     private const char c_tilePlayedMarker = '*';
     
     //------------------------------------------------------------------------------------------------------------------
     // Variables
     //------------------------------------------------------------------------------------------------------------------
-    private List<Queue<Tile>> m_reels;
-    private List<Tile> m_rack;
-    private StringBuilder m_stringBuilder;
-    private IView m_view;
+    private readonly List<Queue<Tile>> m_reels;
+    private readonly List<Tile> m_rack;
+    private readonly StringBuilder m_stringBuilder;
+    private readonly IView m_view;
     
     //------------------------------------------------------------------------------------------------------------------
     // Methods
@@ -117,5 +120,4 @@ public class Rack
         
         return true;
     }
-    
 }

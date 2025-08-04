@@ -2,6 +2,11 @@
 
 namespace ReelWords.Data;
 
+/// <summary>
+/// Trie data structure that allows for fast indexing of words that can be quickly searched.
+/// Implements 3 operations: Insert, Search and Delete.
+/// In the ReelWords game, it is used for verifying if a word exists in a given dictionary. 
+/// </summary>
 public class Trie
 {
     //------------------------------------------------------------------------------------------------------------------

@@ -2,6 +2,9 @@ using ReelWords.Utilities;
 
 namespace ReelWords.Game;
 
+/// <summary>
+/// The tile class represents a single tile or letter contained in a reel or rack. It has a letter and a score.
+/// </summary>
 public class Tile
 {
     //------------------------------------------------------------------------------------------------------------------
