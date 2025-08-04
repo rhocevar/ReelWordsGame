@@ -1,7 +1,7 @@
 ﻿using ReelWords.Data;
 using Xunit;
 
-namespace ReelWordsTests;
+namespace ReelWordsTests.DataTests;
 
 public class TrieTests
 {

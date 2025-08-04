@@ -7,7 +7,7 @@ using ReelWords.Game;
 using ReelWords.View;
 using Xunit;
 
-namespace ReelWordsTests;
+namespace ReelWordsTests.DataTests;
 
 public class FileDataLoaderTests
 {

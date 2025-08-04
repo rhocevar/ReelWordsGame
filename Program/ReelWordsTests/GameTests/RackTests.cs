@@ -4,7 +4,7 @@ using ReelWords.Game;
 using ReelWords.View;
 using Xunit;
 
-namespace ReelWordsTests;
+namespace ReelWordsTests.GameTests;
 
 public class RackTests
 {
