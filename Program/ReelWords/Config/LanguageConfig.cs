@@ -1,4 +1,4 @@
-namespace ReelWords.Data;
+namespace ReelWords.Config;
 
 public enum LanguageConfig
 {

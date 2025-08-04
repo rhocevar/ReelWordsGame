@@ -1,5 +1,5 @@
 using System;
-using ReelWords.Data;
+using ReelWords.Config;
 
 namespace ReelWords.Validation;
 

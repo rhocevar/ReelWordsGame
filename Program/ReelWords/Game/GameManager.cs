@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using ReelWords.Data;
+using ReelWords.Data.Loaders;
 using ReelWords.View;
 
 namespace ReelWords.Game;
@@ -28,7 +29,6 @@ public class GameManager
     //------------------------------------------------------------------------------------------------------------------
     private static GameManager m_instance;
     private IView m_view;
-    private DataLoader m_dataLoader;
     private ReelWordsData m_data;
     private Rack m_rack;
     private int m_totalScore;
@@ -39,7 +39,7 @@ public class GameManager
     private GameManager() { }
     
     //------------------------------------------------------------------------------------------------------------------
-    public void Initialize(IView view, LanguageConfig languageConfig)
+    public void Initialize(IView view, IDataLoader dataLoader)
     {
         m_view = view;
         
@@ -47,9 +47,7 @@ public class GameManager
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         
-        m_dataLoader = new DataLoader(languageConfig, view);
-        
-        m_data = m_dataLoader.Load();
+        m_data = dataLoader.Load();
         if (m_data == null)
         {
             view.DisplayTextLine("There was a problem loading the game data.");

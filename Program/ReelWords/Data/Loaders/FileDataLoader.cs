@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using ReelWords.Config;
 using ReelWords.Game;
 using ReelWords.Utilities;
 using ReelWords.Validation;
 using ReelWords.View;
 
-namespace ReelWords.Data;
+namespace ReelWords.Data.Loaders;
 
-public class DataLoader
+public class FileDataLoader : IDataLoader
 {
     //------------------------------------------------------------------------------------------------------------------
     // Constants
@@ -33,7 +34,7 @@ public class DataLoader
     //------------------------------------------------------------------------------------------------------------------
     // Methods
     //------------------------------------------------------------------------------------------------------------------
-    public DataLoader(LanguageConfig languageConfig, IView view)
+    public FileDataLoader(LanguageConfig languageConfig, IView view)
     {
         m_view = view;
         SetLanguage(languageConfig);

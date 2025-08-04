@@ -1,6 +1,6 @@
 using System;
 
-namespace ReelWords.Data;
+namespace ReelWords.Validation;
 
 public class CharRange
 {
