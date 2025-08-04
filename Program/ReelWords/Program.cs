@@ -7,7 +7,7 @@ using ReelWords.View;
 namespace ReelWords;
 
 /// <summary>
-/// Bootstrap class for the ReelWords game
+/// Bootstrap class for the ReelWords game. Basic initialization configs can be injected here.
 /// </summary>
 public static class Program
 {
