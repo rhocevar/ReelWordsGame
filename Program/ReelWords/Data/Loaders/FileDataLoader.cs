@@ -15,10 +15,10 @@ namespace ReelWords.Data.Loaders;
 /// Loads data asynchronously from multiple files contained in the specified directory. A directory with the given name
 /// should be present upward in the directory tree and contain the files for the dictionary, reels and scores.
 /// 
-/// A language can be specific on initialization, so that the files correspondent to that language will be used for the
+/// A language can be specified on initialization, so that the files correspondent to that language will be used for the
 /// data load. For this assessment, only american english (en-us) is supported.
 /// 
-/// The Load function return a 'ReelWordsData' data structure which contains the words added to a Trie data structure,
+/// The Load function returns a 'ReelWordsData' data structure which contains the words added to a Trie data structure,
 /// the reels and a word validator for the specified language.
 /// </summary>
 public class FileDataLoader : IDataLoader
@@ -34,7 +34,7 @@ public class FileDataLoader : IDataLoader
     // Variables
     //------------------------------------------------------------------------------------------------------------------
     private readonly IView m_view;
-    private DirectoryInfo m_resourcesDirectory;
+    private DirectoryInfo m_directory;
     private WordValidator m_wordValidator;
     private string m_wordsFileName;
     private string m_reelsFileName;
@@ -85,13 +85,13 @@ public class FileDataLoader : IDataLoader
     //------------------------------------------------------------------------------------------------------------------
     private void SetDirectory(string directoryName)
     {
-        m_resourcesDirectory = Utils.TryGetDirectoryInfo(directoryName);
-        if (m_resourcesDirectory == null)
+        m_directory = Utils.TryGetDirectoryInfo(directoryName);
+        if (m_directory == null)
         {
             m_view.DisplayTextLine($"Unable to find {directoryName} directory.");
             throw new DirectoryNotFoundException();
         }
-        m_view.DisplayTextLine("Resources directory found: " + m_resourcesDirectory);
+        m_view.DisplayTextLine("File directory found: " + m_directory);
     }
     
     //------------------------------------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ public class FileDataLoader : IDataLoader
         
         if (!loadReelsTask.IsCompletedSuccessfully || loadReelsTask.Result == null)
         {
-            m_view.DisplayTextLine($"There was a problem initializing the language dictionary: {loadReelsTask.Exception}");
+            m_view.DisplayTextLine($"There was a problem initializing the reels data: {loadReelsTask.Exception}");
             return null;
         }
         
@@ -161,7 +161,7 @@ public class FileDataLoader : IDataLoader
         
         Trie trie = new Trie();
         int validWordsCount = 0, invalidWordsCount = 0;
-        string wordsFilePath = Path.Combine(m_resourcesDirectory.FullName, m_wordsFileName);
+        string wordsFilePath = Path.Combine(m_directory.FullName, m_wordsFileName);
         try
         {
             using StreamReader reader = new StreamReader(wordsFilePath);
@@ -210,8 +210,8 @@ public class FileDataLoader : IDataLoader
         stopwatch.Start();
 
         List<Queue<Tile>> reelsList = new List<Queue<Tile>>();
-        bool initializedReels = false;
-        string reelsFilePath = Path.Combine(m_resourcesDirectory.FullName, m_reelsFileName);
+        bool initializedReel = false;
+        string reelsFilePath = Path.Combine(m_directory.FullName, m_reelsFileName);
         try
         {
             using StreamReader reader = new StreamReader(reelsFilePath);
@@ -219,9 +219,9 @@ public class FileDataLoader : IDataLoader
             while ((line = reader.ReadLine()) != null)
             {
                 string[] letters = line.Split(" ");
-                if (!initializedReels)
+                if (!initializedReel)
                 {
-                    InitializeReels(letters.Length);
+                    InitializeReel(letters.Length);
                 }
 
                 for (int i = 0; i < letters.Length; i++)
@@ -251,14 +251,14 @@ public class FileDataLoader : IDataLoader
         //--------------------------------------------------------------------------------------------------------------
         // Local Methods
         //--------------------------------------------------------------------------------------------------------------
-        void InitializeReels(int nReels)
+        void InitializeReel(int nReels)
         {
             for (int i = 0; i < nReels; i++)
             {
                 reelsList.Add(new Queue<Tile>());
             }
 
-            initializedReels = true;
+            initializedReel = true;
         }
     }
         
@@ -278,7 +278,7 @@ public class FileDataLoader : IDataLoader
         stopwatch.Start();
         
         Dictionary<char, int> scores = new Dictionary<char, int>();
-        string scoresFilePath = Path.Combine(m_resourcesDirectory.FullName, m_scoresFileName);
+        string scoresFilePath = Path.Combine(m_directory.FullName, m_scoresFileName);
         try
         {
             using StreamReader reader = new StreamReader(scoresFilePath);

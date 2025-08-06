@@ -56,7 +56,7 @@ public class Trie
     //------------------------------------------------------------------------------------------------------------------
     private readonly Node m_root = new (c_rootChar);
     private readonly Node m_endOfWord = new (c_endOfWordChar); // Only one end of word node (can be referenced multiple times)
-    private int m_numberOfNodes = 1; // Only considering the root
+    private int m_numberOfNodes = 1; // Only considering the root on initialization
         
     //------------------------------------------------------------------------------------------------------------------
     // Methods
@@ -79,8 +79,13 @@ public class Trie
                 ++m_numberOfNodes;
             }
         }
-            
-        currentNode.AddChild(m_endOfWord);
+
+        // Don't add another end of word marker if one already exists.
+        // This could happen when attempting to add a duplicate word.
+        if (!currentNode.Children.ContainsKey(c_endOfWordChar))
+        {
+            currentNode.AddChild(m_endOfWord);
+        }
     }
         
     //------------------------------------------------------------------------------------------------------------------
@@ -134,8 +139,8 @@ public class Trie
         char childKey = word[index];
         if (node.Children.TryGetValue(childKey, out Node child))
         {
-            bool shouldDeleteWord = DeleteRecursive(word, child, ++index);
-            if (shouldDeleteWord)
+            bool shouldDeleteNode = DeleteRecursive(word, child, ++index);
+            if (shouldDeleteNode)
             {
                 node.Children.Remove(childKey);
                 --m_numberOfNodes;

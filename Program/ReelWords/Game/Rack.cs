@@ -100,7 +100,7 @@ public class Rack
             }
         }
 
-        // If we reached this far, the play was successful.
+        // If we got this far, the play was successful.
         // Update the reels correspondent to the tiles that have been used and calculate the score
         for (int i = 0; i < tempRack.Count; i++)
         {

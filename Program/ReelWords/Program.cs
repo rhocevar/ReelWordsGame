@@ -7,7 +7,7 @@ using ReelWords.View;
 namespace ReelWords;
 
 /// <summary>
-/// Bootstrap class for the ReelWords game. Basic initialization configs can be injected here.
+/// Bootstrap class for the ReelWords game. Basic initialization configs and dependencies can be injected here.
 /// </summary>
 public static class Program
 {
@@ -26,7 +26,8 @@ public static class Program
         IView consoleView = new ConsoleView(Encoding.UTF8);
         
         // The default data loader for this game is the file data loader. We could create a new type of loader that
-        // pulls data from a different source, such as a database, as long as it implements the IDataLoader interface.
+        // pulls data from a different source, such as a database or webservice, as long as it implements the
+        // IDataLoader interface.
         IDataLoader fileDataLoader = new FileDataLoader(languageConfig, consoleView, directoryName:"Resources");
         
         GameManager.Instance.Initialize(consoleView, fileDataLoader);

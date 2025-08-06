@@ -45,7 +45,7 @@ public class WordValidator
     }
     
     //------------------------------------------------------------------------------------------------------------------
-    // Filter out invalid latin words: words containing characters not included in the language dictionary,
+    // Filter out invalid latin words: words containing symbols not included in the allowed character set,
     // one-letter words, capitalized words, null or empty words, etc.
     private bool ValidateWord_Latin(string word)
     {

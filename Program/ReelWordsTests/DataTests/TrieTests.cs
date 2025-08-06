@@ -43,11 +43,33 @@ public class TrieTests
     
     //------------------------------------------------------------------------------------------------------------------
     [Fact]
+    public void TrieInsertTest_DuplicateWord()
+    {
+        m_trie.Insert(c_singleWord);
+        m_trie.Insert(c_singleWord);
+        Assert.True(m_trie.Search(c_singleWord));
+        Assert.True(m_trie.Count == c_singleWord.Length + 1); // Also considering the root
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    [Fact]
     public void TrieDeleteTest_SingleWord()
     {
         m_trie.Insert(c_singleWord);
         m_trie.Delete(c_singleWord);
         Assert.False(m_trie.Search(c_singleWord));
+        Assert.True(m_trie.Count == 1);
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    [Fact]
+    public void TrieDeleteTest_DuplicateWord()
+    {
+        m_trie.Insert(c_singleWord);
+        m_trie.Delete(c_singleWord);
+        m_trie.Delete(c_singleWord);
+        Assert.False(m_trie.Search(c_singleWord));
+        Assert.True(m_trie.Count == 1);
     }
     
     //------------------------------------------------------------------------------------------------------------------
