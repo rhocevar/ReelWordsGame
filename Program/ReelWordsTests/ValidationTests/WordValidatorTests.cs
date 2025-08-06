@@ -16,7 +16,7 @@ public class WordValidatorTests
     //------------------------------------------------------------------------------------------------------------------
     public WordValidatorTests()
     {
-        m_wordValidatorEnUs = new WordValidator(LanguageConfig.en_us);
+        m_wordValidatorEnUs = new WordValidator(languageConfig:LanguageConfig.en_us, maxWordLength:8);
     }
     
     //------------------------------------------------------------------------------------------------------------------

@@ -43,15 +43,15 @@ public class FileDataLoader : IDataLoader
     //------------------------------------------------------------------------------------------------------------------
     // Methods
     //------------------------------------------------------------------------------------------------------------------
-    public FileDataLoader(LanguageConfig languageConfig, IView view, string directoryName)
+    public FileDataLoader(LanguageConfig languageConfig, IView view, string directoryName, uint maxWordLength)
     {
         m_view = view;
-        SetLanguage(languageConfig);
+        SetLanguage(languageConfig, maxWordLength);
         SetDirectory(directoryName);
     }
     
     //------------------------------------------------------------------------------------------------------------------ 
-    private void SetLanguage(LanguageConfig languageConfig)
+    private void SetLanguage(LanguageConfig languageConfig, uint maxWordLength)
     {
         switch (languageConfig)
         {
@@ -60,8 +60,8 @@ public class FileDataLoader : IDataLoader
                 m_wordsFileName = c_enUsFileName;
                 m_reelsFileName = c_defaultReelsFileName;
                 m_scoresFileName = c_defaultScoresFileName;
-                m_wordValidator = new WordValidator(languageConfig);
-                m_view.DisplayTextLine($"Language set to '{languageConfig}'");
+                m_wordValidator = new WordValidator(languageConfig, maxWordLength);
+                m_view.DisplayTextLine($"Language set to '{languageConfig}'. Max word length is '{maxWordLength}'");
                 break;
             }
             case LanguageConfig.en_gb:

@@ -24,7 +24,8 @@ public class FileDataLoaderTests
         m_fileDataLoader = new FileDataLoader(
             languageConfig:LanguageConfig.en_us, 
             view:new ConsoleView(Encoding.UTF8),
-            directoryName: "ResourcesTest"
+            directoryName: "ResourcesTest",
+            maxWordLength:7
         );
     }
     

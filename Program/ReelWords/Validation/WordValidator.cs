@@ -12,19 +12,22 @@ public class WordValidator
     //------------------------------------------------------------------------------------------------------------------
     // Variables
     //------------------------------------------------------------------------------------------------------------------
+    private readonly uint m_maxWordLength;
     private readonly CharRange[] m_allowedCharacters;
     private readonly Func<string, bool> m_validator;
 
     //------------------------------------------------------------------------------------------------------------------
     // Methods
     //------------------------------------------------------------------------------------------------------------------
-    public WordValidator(LanguageConfig languageConfig)
+    public WordValidator(LanguageConfig languageConfig, uint maxWordLength)
     {
         switch (languageConfig)
         {
             case LanguageConfig.en_us:
             case LanguageConfig.en_gb:
-            case LanguageConfig.pt_br: {
+            case LanguageConfig.pt_br:
+            {
+                m_maxWordLength = maxWordLength;
                 m_allowedCharacters = new[] { new CharRange('a', 'z') };
                 m_validator = ValidateWord_Latin;
                 break;
@@ -54,7 +57,7 @@ public class WordValidator
             return false;
         }
         
-        if (word.Length <= 1)
+        if (word.Length <= 1 || word.Length > m_maxWordLength)
         {
             return false;
         }
